@@ -10,7 +10,7 @@ export class ShipmentsService {
   constructor(
     @InjectRepository(Shipment)
     private readonly shipmentRepository: Repository<Shipment>,
-  ) {}
+  ) { }
 
   async findAll(query: ShipmentQueryDto) {
     // 1. Destructure the query for easy access
@@ -23,26 +23,26 @@ export class ShipmentsService {
     // 3. Build the dynamic 'where' object
     const where: FindOptionsWhere<Shipment> = {};
 
-    if (status) {
+    // Only filter if the value is a non-empty string
+    if (status && typeof status === 'string' && status.trim() !== '') {
       where.status = status;
     }
 
-    if (trackingNumber) {
-      // Using ILike for partial, case-insensitive matching
-      where.trackingNumber = ILike(`%${trackingNumber}%`);
+    if (trackingNumber && typeof trackingNumber === 'string' && trackingNumber.trim() !== '') {
+      where.trackingNumber = ILike(`%${trackingNumber.trim()}%`);
     }
 
-    // 4. Query the database
-    // findAndCount returns [items, totalCount]
+    // 4. Query the database with a safety check on order
     const [data, totalItems] = await this.shipmentRepository.findAndCount({
       where,
       order: {
-        [sortBy]: sortOrder,
-      },
+        // We cast to any here to allow dynamic keys, 
+        // but your Zod schema should be the gatekeeper for valid column names!
+        [sortBy || 'createdAt']: sortOrder || 'DESC',
+      } as any,
       take: limit,
       skip: skip,
     });
-
     // 5. Calculate metadata
     const totalPages = Math.ceil(totalItems / limit);
 

@@ -13,7 +13,7 @@ export class ShipmentsSeederService {
 
   async run() {
     console.log('--- Cleaning Database ---');
-    await this.shipmentRepository.delete({});
+    await this.shipmentRepository.clear();
 
     console.log('--- Generating 50 Shipments ---');
     const shipmentsData = Array.from({ length: 50 }).map(() =>

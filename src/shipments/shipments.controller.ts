@@ -12,15 +12,16 @@ import { ZodValidationPipe } from '../common/pipes/ZodValidation.pipe';
 
 @Controller('shipments')
 export class ShipmentsController {
-  constructor(private readonly shipmentsService: ShipmentsService) {}
+  constructor(private readonly shipmentsService: ShipmentsService) { }
 
   /**
    * GET /shipments
    * Handles pagination, sorting, and filtering
    */
   @Get()
-  @UsePipes(new ZodValidationPipe(ShipmentQuerySchema))
-  async findAll(@Query() query: ShipmentQueryDto) {
+  async findAll(
+    @Query(new ZodValidationPipe(ShipmentQuerySchema)) query: ShipmentQueryDto
+  ) {
     return await this.shipmentsService.findAll(query);
   }
 
